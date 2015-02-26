@@ -13,7 +13,7 @@ public class JunglePotion implements Quest {
     //Quest stages
     public static final int QUEST_STARTED = 1;
     public static final int GET_SNAKE = 2;
-    public static final int GET_SITO = 3
+    public static final int GET_ARDRIGAL = 3;
     public static final int GET_SITO = 4;
     public static final int GET_MOSS = 5;
     public static final int GET_PURSE = 6;
@@ -58,7 +58,7 @@ public class JunglePotion implements Quest {
     private static final int questPointReward = 1; //Change
 
     public int getQuestID() { //Change
-	return -1;
+	return 39;
     }
 
     public String getQuestName() { //Change

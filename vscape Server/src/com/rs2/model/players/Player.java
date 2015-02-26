@@ -4601,7 +4601,7 @@ public class Player extends Entity {
 		getActionSender().sendString("@red@Horror From The Deep", 10135); //horror from the deep
 		getActionSender().sendString("", 4508); //Icthlarin's Little Helper 
 		getActionSender().sendString("", 11907); //in search of the myreque
-		getActionSender().sendString("", 7365); //jungle potion
+		getActionSender().sendString("@red@Jungle Potion", 7365); //jungle potion
 		getActionSender().sendString("", 7366);  //legends quest
 		getActionSender().sendString("@red@Lost City", 7367); //lost city
 		getActionSender().sendString("", 13389); //the lost tribe
