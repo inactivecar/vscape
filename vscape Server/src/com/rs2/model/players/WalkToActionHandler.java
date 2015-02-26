@@ -19,6 +19,7 @@ import com.rs2.model.content.minigames.fightcaves.FightCaves;
 import com.rs2.model.content.minigames.magetrainingarena.MageRewardHandling;
 import com.rs2.model.content.minigames.pestcontrol.*;
 import com.rs2.model.content.quests.GhostsAhoy;
+import com.rs2.model.content.quests.JunglePotion;
 import com.rs2.model.content.quests.HeroesQuest;
 import com.rs2.model.content.quests.InSearchOfTheMyreque;
 import com.rs2.model.content.quests.MerlinsCrystal;
@@ -197,6 +198,10 @@ public class WalkToActionHandler {
 					return;
 				}
 				if (player.getBarrows().handleBarrowsDoors(player, id, x, y)) {
+					this.stop();
+					return;
+				}
+				if (JunglePotion.doOjbectFirstClick(player, id, x,y)) {
 					this.stop();
 					return;
 				}
