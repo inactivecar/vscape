@@ -311,7 +311,7 @@ public abstract class Entity {
 	}
 
 	public boolean inRandomEvent() {
-		return Area(2587, 2619, 4760, 4785);
+		return Area(2587, 2619, 4760, 4785) || Area(2005, 2013, 4761, 4764);
 	}
 
 	public boolean inBank() {
@@ -959,10 +959,8 @@ public abstract class Entity {
 	}
 	
 	public static boolean antiStackExceptions(Npc npcLead) {
-	    if(npcLead.isPet() || Barrows.inBarrowsCrypts(npcLead) || npcLead.getNpcId() == 1472 || (npcLead.getNpcId() >= 2881 && npcLead.getNpcId() <= 2883)) {
-		return true;
-	    }
-	    return false;
+		int id = npcLead.getNpcId();
+		return npcLead.isPet() || Barrows.inBarrowsCrypts(npcLead) || id == 1472 || (id >= 2881 && id <= 2883 || id == 1578);
 	}
 	
 	public boolean canMove(Entity leader, int startX, int startY, int endX, int endY, int height, int xLength, int yLength) {

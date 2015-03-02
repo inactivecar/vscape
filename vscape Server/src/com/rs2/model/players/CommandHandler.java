@@ -29,7 +29,6 @@ import com.rs2.model.content.quests.QuestHandler;
 import com.rs2.model.content.quests.MonkeyMadness.ApeAtoll;
 import com.rs2.model.content.quests.RecruitmentDrive;
 import com.rs2.model.content.randomevents.SpawnEvent;
-import com.rs2.model.content.randomevents.TalkToEvent;
 import com.rs2.model.content.randomevents.SpawnEvent.RandomNpc;
 import com.rs2.model.content.skills.Skill;
 import com.rs2.model.content.skills.magic.SpellBook;
@@ -493,6 +492,14 @@ public class CommandHandler {
 					break;
 			}
 		}
+		if (keyword.equals("mime")) {
+			sender.getRandomHandler().getMimeEvent().spawnEvent();
+			sender.getRandomHandler().setCurrentEvent(sender.getRandomHandler().getMimeEvent());
+		}
+		if (keyword.equals("sandwitch")) {
+			sender.getRandomHandler().getSandwichLady().spawnEvent();
+			sender.getRandomHandler().setCurrentEvent(sender.getRandomHandler().getSandwichLady());
+		}
 		/*if (keyword.equals("highscoresinit"))
 		{
 			SQL.initHighScores();
@@ -510,23 +517,7 @@ public class CommandHandler {
 				if (player == null)
 					continue;
 				if (player.getUsername().equalsIgnoreCase(fullString)) {
-					    switch(Misc.random(3)) {
-						case 0 :
-						    TalkToEvent.spawnNpc(player, TalkToEvent.TalkToNpc.DRUNKEN_DWARF);
-						    break;
-						case 1 :
-						    TalkToEvent.spawnNpc(player, TalkToEvent.TalkToNpc.GENIE);
-						    break;
-						case 2 :
-						    TalkToEvent.spawnNpc(player, TalkToEvent.TalkToNpc.JEKYLL);
-						    break;
-						//case 3 :
-						    //TalkToEvent.spawnNpc(this, TalkToEvent.TalkToNpc.RICK);
-						    //break;
-						case 3 :
-						    player.getRandomInterfaceClick().sendEventRandomly();
-						    break;
-					    }
+					player.getRandomHandler().spawnEvent();
 					return;
 				}
 			}
@@ -746,7 +737,7 @@ public class CommandHandler {
 		    long nameLong = NameUtil.nameToLong(name);
 		    Player player = World.getPlayerByName(nameLong);
 		    if(player != null) {
-		    	player.getPillory().JailPlayer();
+		    	player.getRandomHandler().getPillory().JailPlayer();
 		    	sender.getActionSender().sendMessage("Jailed "+ name, true);
 		    }else{
 		    	sender.getActionSender().sendMessage("Could not find player "+name, true);
@@ -760,7 +751,7 @@ public class CommandHandler {
 		    if(player != null) {
 		    	if(!player.getInJail())
 		    		return;
-		    	player.getPillory().UnJailPlayer();
+		    	player.getRandomHandler().getPillory().UnJailPlayer();
 		    	sender.getActionSender().sendMessage("UnJailed "+ name, true);
 		    }else{
 		    	sender.getActionSender().sendMessage("Could not find player "+name, true);
@@ -1119,9 +1110,6 @@ public class CommandHandler {
 		    }
 		    player.setUsername(newName);
 		    sender.getActionSender().sendMessage("Set " + name +"'s username to: " + newName + " .", true);
-		}
-		else if (keyword.equals("forester")) {
-			sender.getFreakyForester().spawnForester();
 		}
 		else if (keyword.equals("playerdump") || keyword.equals("dump")) {
 		    String name = fullString;
@@ -1793,11 +1781,30 @@ public class CommandHandler {
 		else if (keyword.equals("banip")) {
         	BanIpAddress(sender, fullString);
         } 
+		else if (keyword.equals("unbanip")) {
+			String ip = fullString;
+			if(GlobalVariables.isIpBanned(ip)){
+				GlobalVariables.unbanIp(ip);
+				sender.getActionSender().sendMessage("Unbanned IP Address "+ip+".", true);
+			}else{
+				sender.getActionSender().sendMessage("The IP Address "+ip+" is not banned.", true);
+			}
+        } 
 		else if (keyword.equals("banmac")) {
         	BanMacAddress(sender, fullString);
         } 
-		else if (keyword.equals("checkips")) {
-        //	checkHosts();
+		else if (keyword.equals("unbanmac")) {
+			String mac = fullString;
+			if(GlobalVariables.isMacBanned(mac)){
+				GlobalVariables.unbanMac(mac);
+				sender.getActionSender().sendMessage("Unbanned Mac Address "+mac+".", true);
+			}else{
+				sender.getActionSender().sendMessage("The Mac Address "+mac+" is not banned.", true);
+			}
+        } 
+		else if (keyword.equals("reloadbans")) {
+			GlobalVariables.loadBans();
+			sender.getActionSender().sendMessage("Reloaded IP & MAC Bans", true);
         } 
 		else if (keyword.equals("update") ) {
         	final int seconds = Integer.parseInt(args[0]);
@@ -1978,19 +1985,20 @@ public class CommandHandler {
 	//clear note interface
 	public static void ClearNotes(Player player)
 	{
-		if(player.getInterface() == 8134)
-		{
 			int line = 8144;
 			for (int i = 0; i < 120; i++) {
 				if(line > 8195 && line < 12174)
 				{
 					line = 12174;
 				}
+				if(line > 12223) {
+					return;
+				}
 				player.getActionSender().sendString("",line);
 				line++;
 			}
-		}
 	}
+	
 	public static ArrayList<String> macExists(String MAC) {
 		ArrayList<String> matching = new ArrayList<>();
 		int q = 0;

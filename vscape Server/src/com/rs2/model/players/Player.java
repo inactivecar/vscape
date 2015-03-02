@@ -66,9 +66,7 @@ import com.rs2.model.content.quests.MonkeyMadness.MonkeyMadness;
 import com.rs2.model.content.quests.MonkeyMadness.MonkeyMadnessVars;
 import com.rs2.model.content.quests.NatureSpirit;
 import com.rs2.model.content.quests.PiratesTreasure;
-import com.rs2.model.content.randomevents.Pillory;
-import com.rs2.model.content.randomevents.RandomEvent;
-import com.rs2.model.content.randomevents.InterfaceClicking.impl.InterfaceClickHandler;
+import com.rs2.model.content.randomevents.RandomHandler;
 import com.rs2.model.content.skills.ItemOnItemHandling;
 import com.rs2.model.content.skills.Skill;
 import com.rs2.model.content.skills.SkillResources;
@@ -147,7 +145,6 @@ import com.rs2.model.content.quests.QuestHandler;
 import com.rs2.model.content.quests.QuestVariables;
 import com.rs2.model.content.quests.RecruitmentDrive;
 import com.rs2.model.content.quests.SantaEncounter;
-import com.rs2.model.content.randomevents.FreakyForester;
 import com.rs2.model.content.skills.ranging.DwarfMultiCannon;
 import com.rs2.model.content.skills.farming.MithrilSeeds;
 import com.rs2.model.content.skills.firemaking.BarbarianSpirits;
@@ -197,9 +194,8 @@ public class Player extends Entity {
 	private MithrilSeeds seeds = new MithrilSeeds(this);
 	private Barrows barrows = new Barrows(this);
 	private BarbarianSpirits barbarianSpirits = new BarbarianSpirits(this);
-	private FreakyForester freakyForester = new FreakyForester(this);
-	private Pillory pillory = new Pillory(this);
 	private GhostsAhoyPetition petition = new GhostsAhoyPetition(this);
+	private RandomHandler randomHandler = new RandomHandler(this);
 	private boolean wyvernWarned = false;
 	private Slayer slayer = new Slayer(this);
 	private NewComersSide newComersSide = new NewComersSide(this);
@@ -255,7 +251,6 @@ public class Player extends Entity {
 	private Cat cat = new Cat(this);
 	private MonkeyMadnessVars MMVars = new MonkeyMadnessVars(this);
 	private QuestVariables questVars = new QuestVariables(this);
-	private InterfaceClickHandler randomInterfaceClick = new InterfaceClickHandler(this);
 	private DialogueManager dialogue = new DialogueManager(this);
 	private BankPin bankPin = new BankPin(this);
 	private Login login = new Login();
@@ -468,7 +463,6 @@ public class Player extends Entity {
 //	private boolean secondTryAtBin = false;
 	private int ectoWorshipCount = 0;
 	private Canoe canoe = new Canoe(this);
-    private String currentChannel = null;
     private boolean homeTeleporting = false;
     private DwarfMultiCannon dwarfMultiCannon = new DwarfMultiCannon(this);
     private boolean inJail = false;
@@ -478,6 +472,7 @@ public class Player extends Entity {
     private int minloggedout = 0;
     
     private ClanChat currentClanChat;
+    private boolean movementDisabled = false;
     
 	public void resetAnimation() {
 		getUpdateFlags().sendAnimation(-1);
@@ -784,7 +779,10 @@ public class Player extends Entity {
 		npc.walkTo(npc.getSpawnPosition() == null ? npc.getPosition().clone() : npc.getSpawnPosition().clone(), true);
 	    }
         }
-        RandomEvent.resetEvents(this);
+        if(getRandomHandler().getCurrentEvent() != null)
+        {
+        	getRandomHandler().destroyEvent();
+        }
 		setLogoutTimer(System.currentTimeMillis() + (this.inWild() ? 600000 : 1000)); //originally 600000
         setLoginStage(LoginStages.LOGGING_OUT);
         key.attach(null);
@@ -836,7 +834,7 @@ public class Player extends Entity {
 		    actionSender.sendEnergy();
 		}
 		getDesertHeat().CheckDesertHeat();
-		if(inMortMyreSwamp() && Misc.random(50) == 1) {
+		if(inMortMyreSwamp() && Misc.random(150) == 1) {
 		    NatureSpirit.handleSwampRot(this);
 		}
 		if(timeOutCheck()) {
@@ -1110,7 +1108,7 @@ public class Player extends Entity {
 		    this.getActionSender().sendUpdateServer(GlobalVariables.getServerUpdateTimer().ticksRemaining());
 		}*/
 		setLogoutTimer(System.currentTimeMillis() + 600000);
-		RandomEvent.startRandomEvent(this);
+		getRandomHandler().process();
 		setAppearanceUpdateRequired(true);
 	//	QuestHandler.initPlayer(this);
 		QuestHandler.initQuestLog(this);
@@ -1232,6 +1230,10 @@ public class Player extends Entity {
         		setClanChat(null);
         	}
         }
+        if(inRandomEvent())
+        {
+        	teleport(getLastPosition());
+        }
     }
 	
 	public boolean beginLogin() throws Exception {
@@ -1259,7 +1261,7 @@ public class Player extends Entity {
 				return false;
 			}
 		}
-		if (getUsernameAsLong() <= 0L || getUsernameAsLong() >= 0x5b5b57f8a98a5dd1L)
+		if (getUsernameAsLong() <= 0L || getUsernameAsLong() >= 0x7dcff8986ea31000L)
 		{
 			return false;
 		}
@@ -1781,15 +1783,7 @@ public class Player extends Entity {
 	public BarbarianSpirits getBarbarianSpirits() {
 		return barbarianSpirits;
 	}
-	
-	public FreakyForester getFreakyForester() {
-		return freakyForester;
-	}
-	
-	public Pillory getPillory() {
-		return pillory;
-	}
-	
+
 	public GhostsAhoyPetition getPetition() {
 		return petition;
 	}
@@ -2041,10 +2035,6 @@ public class Player extends Entity {
 
 	public Fishing getFishing() {
 		return fishing;
-	}
-
-	public InterfaceClickHandler getRandomInterfaceClick() {
-		return randomInterfaceClick;
 	}
 
 	public SkillResources getSkillResources() {
@@ -4126,12 +4116,7 @@ public class Player extends Entity {
         {
         	return false;
         }
-    	for(String ip : GlobalVariables.getBannedIps()){
-    		if(ip.contentEquals(getHost())){
-    			return true;
-    		}
-    	}
-    	return false;
+    	return GlobalVariables.isIpBanned(getHost());
     }
     
     public boolean isMacBanned() 
@@ -4140,12 +4125,7 @@ public class Player extends Entity {
         {
         	return false;
         }
-    	for(String mac : GlobalVariables.getBannedMacs()){
-    		if(mac.contentEquals(getMacAddress())){
-    			return true;
-    		}
-    	}
-    	return false;
+    	return GlobalVariables.isMacBanned(getMacAddress());
     }
 
 	/**
@@ -4771,6 +4751,18 @@ public class Player extends Entity {
 
 	public void setClanChat(ClanChat currentClanChat) {
 		this.currentClanChat = currentClanChat;
+	}
+
+	public RandomHandler getRandomHandler() {
+		return randomHandler;
+	}
+	
+	public void setMovementDisabled(boolean state){
+		movementDisabled = state;
+	}
+	
+	public boolean getMovementDisabled(){
+		return movementDisabled;
 	}
 
 }

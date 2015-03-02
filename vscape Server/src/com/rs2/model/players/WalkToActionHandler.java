@@ -87,8 +87,8 @@ import com.rs2.util.clip.Rangable;
 import com.rs2.model.content.quests.QuestHandler;
 import com.rs2.model.content.quests.TheGrandTree;
 import com.rs2.model.content.quests.TreeGnomeVillage;
-import com.rs2.model.content.randomevents.FreakyForester;
 import com.rs2.model.content.randomevents.SpawnEvent;
+import com.rs2.model.content.randomevents.impl.FreakyForester;
 import com.rs2.model.content.skills.agility.Agility;
 import com.rs2.model.content.skills.firemaking.BarbarianSpirits;
 import com.rs2.model.content.skills.smithing.DragonfireShieldSmithing;
@@ -174,8 +174,9 @@ public class WalkToActionHandler {
 				objectPosition = Misc.goodDistanceObject(def.getPosition().getX(), def.getPosition().getY(), player.getPosition().getX(), player.getPosition().getY(), object.getSizeX(def.getFace()), object.getSizeY(def.getFace()), z);
 				
 				if(id != 1729 && id != 2290) {
-				    if (objectPosition == null)
+				    if (objectPosition == null) {
 					return;
+				    }
 				}
 				if(id != 1729 && id != 2290) {
 				    if (!canInteractWithObject(player, objectPosition, def)) {
@@ -522,7 +523,7 @@ public class WalkToActionHandler {
 					}
 					break;*/
 				case 6836 :
-						player.getPillory().openInterface();
+						player.getRandomHandler().getPillory().openInterface();
 					break;
 				case 2303: //Yanille dungeon balancing ledge
 				    Agility.crossLedge(player, 2580, player.getPosition().getY() < 9520 ? 9520 : 9512, player.getPosition().getY() < 9520 ? 3 : 1, 10, 40, 25);
@@ -612,9 +613,14 @@ public class WalkToActionHandler {
 					player.teleport(new Position(2636, 9517, 0));
 					break;
 				    }
+				case 3205: //ladder down
+					if(x == 2766 && y == 3121) {
+						Ladders.climbLadder(player, new Position(2767, 3121, 0)); //General store karamja
+						break;
+					}
 				case 8972: //freaky forester portal
 				    if(x == 2611 && y == 4776) {
-					FreakyForester forester = player.getFreakyForester();
+					FreakyForester forester = player.getRandomHandler().getFreakyForester();
 					if(forester.isActive()) {
 					    player.getDialogue().sendNpcChat("Hey! D-don't leave yet! I still need", "your help with this pheasant...", Dialogues.SAD);
 					    break;
@@ -1254,6 +1260,9 @@ public class WalkToActionHandler {
 					break;
 				case GhostsAhoy.TRAPDOOR:
 					TrapDoor.handleTrapdoor(player, id, 5268, def);
+					break;
+				case InSearchOfTheMyreque.TRAPDOOR:
+					TrapDoor.handleTrapdoor(player, id, 6435, def);
 					break;
 				case 1570: // climb down trapdoor
 				case 5947: // climb into lumby swamp
@@ -2963,16 +2972,16 @@ public class WalkToActionHandler {
 			return true;
 		}
 		if(def.getId() == 1729) {
-		    if(Misc.goodDistance(player.getPosition(), def.getPosition(), 4))
-			return true;
+			return Misc.goodDistance(player.getPosition(), def.getPosition(), 4);
 		}
 		if(def.getId() == 2290) {
-		    if(Misc.goodDistance(player.getPosition(), def.getPosition(), 3))
-			return true;
+			return Misc.goodDistance(player.getPosition(), def.getPosition(), 3);
+		}
+		if(def.getId() == 5061 || def.getId() == 5060) {
+			return Misc.goodDistance(player.getPosition(), objectPos, 2);
 		}
 		if(def.getId() == 5002) {
-		    if(Misc.goodDistance(player.getPosition(), def.getPosition(), 1))
-			return true;
+		    return Misc.goodDistance(player.getPosition().clone().modifyZ(player.getPosition().getZ()%4), def.getPosition(), 1);
 		}
 		Rangable.removeObjectAndClip(def.getId(), def.getPosition().getX(), def.getPosition().getY(), def.getPosition().getZ(), def.getFace(), def.getType());
 		boolean canInteract = Misc.checkClip(player.getPosition().clone().modifyZ(player.getPosition().getZ()%4), objectPos, false);

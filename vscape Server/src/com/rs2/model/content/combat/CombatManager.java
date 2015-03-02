@@ -25,6 +25,7 @@ import com.rs2.model.content.quests.FamilyCrest;
 import com.rs2.model.content.quests.GhostsAhoy;
 import com.rs2.model.content.quests.HeroesQuest;
 import com.rs2.model.content.quests.HorrorFromTheDeep;
+import com.rs2.model.content.quests.InSearchOfTheMyreque;
 import com.rs2.model.content.quests.MonkeyMadness.MonkeyMadness;
 import com.rs2.model.content.quests.NatureSpirit;
 import com.rs2.model.content.quests.PriestInPeril;
@@ -98,7 +99,7 @@ public class CombatManager extends Tick {
 				return;
 	        }
 		}
-        if((victim.isNpc() && !((Npc)victim).isVisible()) || victim.isDead()) {
+        if(victim.isNpc() && (!((Npc)victim).isVisible() || victim.isDead() || ((Npc)victim).isDontAttack())) {
 			return;
         }
 	    if (victim.isNpc() && ((Npc) victim).walkingBackToSpawn) {
@@ -132,7 +133,7 @@ public class CombatManager extends Tick {
 	            CombatManager.resetCombat(attacker);
 	            return;
 		}
-		if(attacker.isPlayer() && !(((Player) attacker).getFreakyForester().isActive()) && victim.isNpc() && ((Npc)victim).getDefinition().getName().toLowerCase().equals("pheasant")) {
+		if(attacker.isPlayer() && !(((Player) attacker).getRandomHandler().getFreakyForester().isActive()) && victim.isNpc() && ((Npc)victim).getDefinition().getName().toLowerCase().equals("pheasant")) {
 		    ((Player)attacker).getDialogue().sendPlayerChat("I shouldn't attack these poor birds like that.", Dialogues.SAD);
 		    return;
 		}
@@ -463,7 +464,8 @@ public class CombatManager extends Tick {
 			RecruitmentDrive.handleDeath((Player) killer, npc);
 			MonkeyMadness.handleDeath((Player) killer, npc);
 			NatureSpirit.handleDeath((Player) killer, npc);
-			((Player) killer).getFreakyForester().handleDrops(npc);
+			InSearchOfTheMyreque.handleDeath((Player) killer, npc);
+			((Player) killer).getRandomHandler().getFreakyForester().handleDrops(npc);
 			if(((Player) killer).getSpawnedNpc() != null) {
 			    ((Player) killer).setSpawnedNpc(null);
 			}
