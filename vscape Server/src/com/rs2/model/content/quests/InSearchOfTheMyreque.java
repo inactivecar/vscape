@@ -288,18 +288,6 @@ public class InSearchOfTheMyreque implements Quest {
 		player.getActionSender().sendString(getQuestName(), 8144);
 	}
 
-	public void dialogue(Player player, Npc npc) {
-		//Don't even need this anymore really
-	}
-
-	public int getDialogueStage(Player player) {
-		return dialogueStage;
-	}
-
-	public void setDialogueStage(int in) {
-		dialogueStage = in;
-	}
-
 	public static boolean allWeapons(Player player) {
 		Inventory i = player.getInventory();
 		return i.playerHasItem(STEEL_LONGSWORD) && i.playerHasItem(STEEL_SWORD, 2) && i.playerHasItem(STEEL_DAGGER) && i.playerHasItem(STEEL_MACE) && i.playerHasItem(STEEL_WARHAMMER);
@@ -317,8 +305,8 @@ public class InSearchOfTheMyreque implements Quest {
 		return 0;
 	}
 
-	public static void spawnBridgeObjects(int z, boolean destroyOnly) {
-
+	public static void spawnBridgeObjects(final Player player, int z, boolean destroyOnly) {
+		player.reloadRegion();
 	}
 	
 	public static void sailSwampBoat(final Player player, final boolean toMortton) {
@@ -382,7 +370,7 @@ public class InSearchOfTheMyreque implements Quest {
 				switch (count) {
 					case 1:
 						d.setLastNpcTalk(VELIAF_HURTZ);
-						d.sendNpcChat("Hey, what's that mist coming in through the door!", "TEAM WE HABE A VAMPIRE IN THE ROOM!", DISTRESSED);
+						d.sendNpcChat("Hey, what's that mist coming in through the door!", "TEAM WE HAVE A VAMPIRE IN THE ROOM!", DISTRESSED);
 						break;
 					case 2:
 						player.getActionSender().removeInterfaces();
@@ -447,6 +435,7 @@ public class InSearchOfTheMyreque implements Quest {
 			public void stop() {
 				player.getActionSender().sendMapState(0);
 				player.setStopPacket(false);
+				player.setInCutscene(false);
 			}
 		}, 8);
 	}
@@ -474,7 +463,7 @@ public class InSearchOfTheMyreque implements Quest {
 		return false;
 	}
 	
-	public static void handleDeath(final Player player, final Npc died) {
+	public void handleDeath(final Player player, final Npc died) {
 		if(died.getNpcId() == SKELETON_HELLHOUND && player.getQuestStage(38) == TALKED_TO_MYREQUE) {
 			player.setQuestStage(38, FIGHT_WON);
 		}
@@ -539,12 +528,37 @@ public class InSearchOfTheMyreque implements Quest {
 				player.fadeTeleport(new Position(3509, 3449, 0));
 				return true;
 			case BROKEN_ROPE_BRIDGE:
-				if (player.getInventory().playerHasItem(PLANK) && player.getInventory().playerHasItem(STEEL_NAILS, 75) && player.getInventory().playerHasItem(HAMMER)) {
-					if (bridgeIndexForPos(y) != 0) {
-						player.getQuestVars().setMortMyreBridgeFixed(bridgeIndexForPos(y), true);
-						player.getUpdateFlags().sendAnimation(898);
-						player.getInventory().removeItem(new Item(PLANK));
-						player.getInventory().removeItem(new Item(STEEL_NAILS, 75));
+				if (bridgeIndexForPos(y) != 0) {
+					if (!player.getQuestVars().getMortMyreBridgeFixed(bridgeIndexForPos(y))) {
+						if (player.getInventory().playerHasItem(PLANK) && player.getInventory().playerHasItem(STEEL_NAILS, 75) && player.getInventory().playerHasItem(HAMMER)) {
+							player.getQuestVars().setMortMyreBridgeFixed(bridgeIndexForPos(y), true);
+							player.getUpdateFlags().sendAnimation(898);
+							player.getInventory().removeItem(new Item(PLANK));
+							player.getInventory().removeItem(new Item(STEEL_NAILS, 75));
+							player.setStopPacket(true);
+							CycleEventHandler.getInstance().addEvent(player, new CycleEvent() {
+								int count = 0;
+
+								@Override
+								public void execute(CycleEventContainer b) {
+									ObjectHandler.getInstance().removeObject(x, y, player.getPosition().getZ(), 22);
+									new GameObject(5002, x, y, player.getPosition().getZ(), 1, 22, 0, 999999, true);
+									if (count == 1) {
+										b.stop();
+									}
+									count++;
+								}
+
+								@Override
+								public void stop() {
+									player.setStopPacket(false);
+									player.getActionSender().walkTo(0, y - player.getPosition().getY(), true);
+								}
+							}, 1);
+						} else {
+							player.getDialogue().sendStatement("You need a wooden plank, 75 steel nails and a hammer to fix this.");
+						}
+					} else if (player.getQuestVars().getMortMyreBridgeFixed(bridgeIndexForPos(y))) {
 						player.setStopPacket(true);
 						CycleEventHandler.getInstance().addEvent(player, new CycleEvent() {
 							int count = 0;
@@ -566,8 +580,6 @@ public class InSearchOfTheMyreque implements Quest {
 							}
 						}, 1);
 					}
-				} else {
-					player.getDialogue().sendStatement("You need a wooden plank, 75 steel nails and a hammer to fix this.");
 				}
 				return true;
 			case ROPE_BRIDGE:
@@ -584,7 +596,7 @@ public class InSearchOfTheMyreque implements Quest {
 					player.getActionSender().sendMessage("You are already on the bridge!", true);
 				} else {
 					Ladders.climbLadder(player, new Position(3502, player.getPosition().getY() < 3428 ? player.getPosition().getY() + 2 : player.getPosition().getY() - 2, player.getIndex() * 4));
-					spawnBridgeObjects(player.getIndex() * 4, false);
+					spawnBridgeObjects(player, player.getIndex() * 4, false);
 				}
 				return true;
 			case SWAMP_BOAT:
@@ -602,7 +614,7 @@ public class InSearchOfTheMyreque implements Quest {
 		return false;
 	}
 
-	public static boolean doObjectSecondClick(final Player player, int object, final int x, final int y) {
+	public boolean doObjectSecondClick(final Player player, int object, final int x, final int y) {
 		switch (object) {
 			case STALAGMITE:
 				if (player.getSkill().getLevel()[Skill.AGILITY] < 25) {
@@ -626,7 +638,7 @@ public class InSearchOfTheMyreque implements Quest {
 				return true;
 			case TREE:
 				Ladders.climbLadder(player, new Position(3502, player.getPosition().getY() < 3428 ? player.getPosition().getY() - 2 : player.getPosition().getY() + 2, 0));
-				spawnBridgeObjects(player.getIndex() * 4, true);
+				spawnBridgeObjects(player, player.getIndex() * 4, true);
 				return true;
 			case SWAMP_BOAT:
 				if (player.getQuestStage(38) >= BOARD_BOAT) {

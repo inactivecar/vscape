@@ -157,7 +157,7 @@ public class WalkToActionHandler {
 				}
 				GameObjectDef def = SkillHandler.getObject(id, x, y, z);
 				if (def == null) { // Server.npcHandler.getNpcByLoc(Location.create(x,
-					if (id == 2142 || id == 2297 || id == 4879 || (id >= 7272 && id <= 7287)  || id == 4766 || id == 5002 || id == 3522 || id == 4880 || id == 4881 || id == 5015 || id == 2311 || id == 2294 || id == 2295 || id == 2296 || id == 2022 || id == 9293  || id == 9328 || id == 2834 || id == 9330 || id == 9322 || id == 9324 || id == 2332 || id == 3931 || id == 3932 || id == 3933 || (id == 3203 || id == 4616 || id == 4615) || (id == 2213 && x == 3513) || (id == 356 && y == 3507) || GameObjectData.forId(id).getName().toLowerCase().contains("gangplank") || (id >= 14227 && id <= 14231)) { //exceptions
+					if (id == 2142 || id == 2297 || id == 4879 || (id >= 7272 && id <= 7287)  || id == 5003 || id == 4766 || id == 5002 || id == 3522 || id == 4880 || id == 4881 || id == 5015 || id == 2311 || id == 2294 || id == 2295 || id == 2296 || id == 2022 || id == 9293  || id == 9328 || id == 2834 || id == 9330 || id == 9322 || id == 9324 || id == 2332 || id == 3931 || id == 3932 || id == 3933 || (id == 3203 || id == 4616 || id == 4615) || (id == 2213 && x == 3513) || (id == 356 && y == 3507) || GameObjectData.forId(id).getName().toLowerCase().contains("gangplank") || (id >= 14227 && id <= 14231)) { //exceptions
 						def = new GameObjectDef(id, 10, 0, new Position(x, y, z));
 					} else if (id == 4381 || id == 4382 || id == 4385 || id == 4386) { //exceptions
 						def = new GameObjectDef(id, 11, 0, new Position(x, y, z));
@@ -1786,9 +1786,11 @@ public class WalkToActionHandler {
 				Position loc = new Position(player.getClickX(), player.getClickY(), z);
 				if (object != null)
 					player.getUpdateFlags().sendFaceToDirection(loc.getActualLocation(object.getBiggestSize()));
-				if (PriestInPeril.doObjectSecondClicking(player, id, x, y)) {
-				    this.stop();
-				    return;
+				for (Quest q : QuestHandler.getQuests()) {
+					if (q.doObjectSecondClick(player, id, x, y)) {
+						this.stop();
+						return;
+					}
 				}
 				if (ThieveOther.handleObjectClick2(player, id, x, y)) {
 					this.stop();
@@ -1808,30 +1810,6 @@ public class WalkToActionHandler {
 					return;
 				}
 				if (PickableObjects.pickObject(player, id, x, y)) {
-					this.stop();
-					return;
-				}
-				if(MerlinsCrystal.doObjectSecondClick(player, id, x, y)) {
-					this.stop();
-					return;
-				}
-				if(GhostsAhoy.doObjectSecondClick(player, id, x, y)) {
-					this.stop();
-					return;
-				}
-				if(HeroesQuest.doObjectSecondClick(player, id, x, y)) {
-					this.stop();
-					return;
-				}
-				if(TreeGnomeVillage.doObjectSecondClick(player, id, x, y)) {
-					this.stop();
-					return;
-				}
-				if(NatureSpirit.doObjectSecondClick(player, id, x, y)) {
-					this.stop();
-					return;
-				}
-				if(InSearchOfTheMyreque.doObjectSecondClick(player, id, x, y)) {
 					this.stop();
 					return;
 				}
@@ -2979,6 +2957,9 @@ public class WalkToActionHandler {
 		}
 		if(def.getId() == 5061 || def.getId() == 5060) {
 			return Misc.goodDistance(player.getPosition(), objectPos, 2);
+		}
+		if(def.getId() == 5003) {
+			return Misc.goodDistance(player.getPosition(), new Position(objectPos.getX(), objectPos.getY(), player.getPosition().getZ()), 1);
 		}
 		if(def.getId() == 5002) {
 		    return Misc.goodDistance(player.getPosition().clone().modifyZ(player.getPosition().getZ()%4), def.getPosition(), 1);
