@@ -20,16 +20,21 @@ public class JunglePotion implements Quest {
     public static final int QUEST_COMPLETE = 7;
 
     //Items
-    public static final int SNAKE_WEED = 1526;
-    public static final int ARDRIGAL = 1528;
-    public static final int SITO_FOIL = 1530;
-    public static final int VOLENCIA_MOSS = 1532;
-    public static final int ROGUES_PURSE = 1534;
+    public static final int SNAKE_WEED_G = 1525;
+    public static final int SNAKE_WEED_C = 1526;
+    public static final int ARDRIGAL_G = 1527;
+    public static final int ARDRIGAL_C = 1528;
+    public static final int SITO_FOIL_G = 1529;
+    public static final int SITO_FOIL_C = 1530;
+    public static final int VOLENCIA_MOSS_G= 1531;
+    public static final int VOLENCIA_MOSS_C = 1532;
+    public static final int ROGUES_PURSE_G = 1533;
+    public static final int ROGUES_PURSE_C = 1534;
     
     //Positions
     //public static final Position POSITION = new Position(0, 0, 0);
     public static final Position ROGUES_PURSE_CAVE= new Position(2830, 9522, 0);
-    public static final Position ROGUES_PURSE_CAVE_EXIT= new Position(2823, 3319, 0);
+    public static final Position ROGUES_PURSE_CAVE_EXIT= new Position(2823, 3119, 0);
     //Interfaces
     //public static final int INTERFACE = -1;
 
@@ -44,7 +49,7 @@ public class JunglePotion implements Quest {
     public static final int VOLENCIA_ROCK = 2581;
     public static final int ROUGE_CAVE_ROCKS = 2584;
     public static final int ROUGES_CAVE_HANDHOLDS = 2585;
-    public static final int ROUGES_CAVE_FUNGUS = 2683; 
+    public static final int ROUGES_CAVE_FUNGUS = 2583; 
     public int dialogueStage = 0;
 
     private int reward[][] = { //{itemId, count},
@@ -87,7 +92,7 @@ public class JunglePotion implements Quest {
     public void completeQuest(Player player) {
 	getReward(player);
 	player.getActionSender().sendInterface(12140);
-	player.getActionSender().sendItemOnInterface(12145, 250, SNAKE_WEED); //zoom, then itemId
+	player.getActionSender().sendItemOnInterface(12145, 250, SNAKE_WEED_C); //zoom, then itemId
 	player.getActionSender().sendString("You have completed " + getQuestName() + "!", 12144);
 	player.getActionSender().sendString("You are rewarded: ", 12146);
 	player.getActionSender().sendString("1 Quest Point", 12150);
@@ -201,7 +206,7 @@ public class JunglePotion implements Quest {
 
     public boolean doObjectClicking(final Player player, int object, int x, int y) {
 	switch (object) {
-	    case  SNAKE_WEED_VINE : //snake weed pick
+	  /**  case  SNAKE_WEED_VINE : //snake weed pick
 			player.getInventory().addItemOrDrop(new Item(SNAKE_WEED));
 			player.getActionSender().sendMessage("You grab a bit of Snake weed", true ); //Spare controls crate
 		return true;
@@ -224,7 +229,7 @@ public class JunglePotion implements Quest {
 	   case  ROUGE_CAVE_ROCKS :
 		//player.fadeTeleport(ROUGES_PURSE_CAVE);
 		Ladders.climbLadder(player, ROGUES_PURSE_CAVE);
-		return true;
+		return true; **/
 	   case  ROUGES_CAVE_HANDHOLDS :
 		Ladders.climbLadder(player, ROGUES_PURSE_CAVE_EXIT);
 		//player.fadeTeleport(ROUGES_PURSE_CAVE_EXIT);
@@ -235,6 +240,30 @@ public class JunglePotion implements Quest {
 
     public static boolean doObjectSecondClick(final Player player, int object, final int x, final int y) {
 	switch (object) {
+	   case  SNAKE_WEED_VINE : //snake weed pick
+                        player.getInventory().addItemOrDrop(new Item(SNAKE_WEED_G));
+                        player.getActionSender().sendMessage("You grab a bit of Snake weed", true ); //Spare controls crate
+                return true;
+            case  ARDRIGAL_TREE ://palm tree pick
+                        player.getInventory().addItemOrDrop(new Item(ARDRIGAL_G));
+                        player.getActionSender().sendMessage("You manage to grab some Ardrigal from the tree", true );
+                return true;
+           case  SITO_GROUND : //burnt ground search
+                        player.getInventory().addItemOrDrop(new Item(SITO_FOIL_G));
+                        player.getActionSender().sendMessage("You sweep away some dirt and find some Sito Foil", true );
+                return true;
+           case  ROUGES_CAVE_FUNGUS ://cave fungus
+                        player.getInventory().addItemOrDrop(new Item(ROGUES_PURSE_G));
+                        player.getActionSender().sendMessage("You pull some Rogues purse from the wall", true );
+                return true;
+           case  VOLENCIA_ROCK : //rocks that have herbs
+                        player.getInventory().addItemOrDrop(new Item(VOLENCIA_MOSS_G));
+                        player.getActionSender().sendMessage("You find some Moss on the rock.", true );
+                return true;
+           case  ROUGE_CAVE_ROCKS :
+                //player.fadeTeleport(ROUGES_PURSE_CAVE);
+                Ladders.climbLadder(player, ROGUES_PURSE_CAVE);
+                return true;
 
 	}
 	return false;
