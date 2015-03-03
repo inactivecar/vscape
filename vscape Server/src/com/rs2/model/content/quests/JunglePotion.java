@@ -77,6 +77,8 @@ public class JunglePotion implements Quest {
     public boolean canDoQuest(final Player player) {
 	return true;
     }
+    public void handleDeath(final Player player, final Npc died) {
+            }
 
     public void getReward(Player player) {
 	for (int[] rewards : reward) {
@@ -183,7 +185,23 @@ public class JunglePotion implements Quest {
     
     public boolean itemHandling(final Player player, int itemId) {
 	switch(itemId) {
-	    
+		case SNAKE_WEED_G :
+			player.getInventory().replaceItemWithItem(new Item(SNAKE_WEED_G), new Item(SNAKE_WEED_C));
+			return true;
+	   	case ARDRIGAL_G :
+			player.getInventory().replaceItemWithItem(new Item(ARDRIGAL_G), new Item(ARDRIGAL_C));
+                        return true;
+                case SITO_FOIL_G :
+                        player.getInventory().replaceItemWithItem(new Item(SITO_FOIL_G), new Item(SITO_FOIL_C));
+                        return true;
+                case ROGUES_PURSE_G :
+                        player.getInventory().replaceItemWithItem(new Item(ROGUES_PURSE_G), new Item(ROGUES_PURSE_C));
+                        return true;
+                case VOLENCIA_MOSS_G :
+                        player.getInventory().replaceItemWithItem(new Item(VOLENCIA_MOSS_G), new Item(VOLENCIA_MOSS_C));
+                        return true;
+
+ 
 	}
 	return false;
     }
@@ -238,7 +256,7 @@ public class JunglePotion implements Quest {
 	return false;
     }
 
-    public static boolean doObjectSecondClick(final Player player, int object, final int x, final int y) {
+    public boolean doObjectSecondClick(final Player player, int object, final int x, final int y) {
 	switch (object) {
 	   case  SNAKE_WEED_VINE : //snake weed pick
                         player.getInventory().addItemOrDrop(new Item(SNAKE_WEED_G));

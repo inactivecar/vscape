@@ -202,10 +202,10 @@ public class WalkToActionHandler {
 					this.stop();
 					return;
 				}
-				if (JunglePotion.doOjbectFirstClick(player, id, x,y)) {
+				/**if (JunglePotion.doOjbectFirstClick(player, id, x,y)) {
 					this.stop();
 					return;
-				}
+				}**/
 				if (PickableObjects.pickObject(player, id, x, y)) {
 					this.stop();
 					return;
