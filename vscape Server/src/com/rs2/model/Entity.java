@@ -311,7 +311,11 @@ public abstract class Entity {
 	}
 
 	public boolean inRandomEvent() {
-		return Area(2587, 2619, 4760, 4785) || Area(2005, 2013, 4761, 4764);
+		return Area(2587, 2619, 4760, 4785) || inMimeEvent();
+	}
+	
+	public boolean inMimeEvent() {
+		return Area(2005, 2013, 4761, 4764);
 	}
 
 	public boolean inBank() {
@@ -375,6 +379,10 @@ public abstract class Entity {
 	
 	public boolean inDarkWizardCircle() {
 		return Area(3224, 3231, 3367, 3372);
+	}
+	
+	public boolean inWestArdougne() {
+		return Area(2459, 2557, 3279, 3335) || Area(2509, 2557, 3264, 3335);
 	}
 	
 	public boolean inFightCaves() {

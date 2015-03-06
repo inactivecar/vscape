@@ -63,7 +63,9 @@ public class QuestHandler {
 	new MonkeyMadness(),
 	new NatureSpirit(),
 	new InSearchOfTheMyreque(),
+	new PlagueCity(),
 	new JunglePotion()
+	//new Biohazard()
     };
     
     public static void init() {
@@ -259,8 +261,14 @@ public class QuestHandler {
 			showInterface(player,quests[38]);
         		return true;
 		case 7365: //Jungle Potion
-			showInterface(player,quests[39]);
+			showInterface(player,quests[40]);
 			return true;
+		case 28204: //Plague City
+			showInterface(player,quests[39]);
+        		return true;
+		case 28184: //Biohazard
+			//showInterface(player,quests[40]);
+        		return true;
         }
         return false;
     }

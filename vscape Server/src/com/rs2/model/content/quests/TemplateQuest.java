@@ -6,6 +6,9 @@ import com.rs2.model.content.dialogue.DialogueManager;
 import com.rs2.model.npcs.Npc;
 import com.rs2.model.players.Player;
 import com.rs2.model.players.item.Item;
+import com.rs2.model.tick.CycleEvent;
+import com.rs2.model.tick.CycleEventContainer;
+import com.rs2.model.tick.CycleEventHandler;
 import com.rs2.net.ActionSender;
 
 public class TemplateQuest implements Quest {
@@ -29,8 +32,6 @@ public class TemplateQuest implements Quest {
 
 	//Objects
 	public static final int OBJECT = -1;
-
-	public int dialogueStage = 0;
 
 	private int reward[][] = { //{itemId, count},
 	};
@@ -56,12 +57,22 @@ public class TemplateQuest implements Quest {
 		return false;
 	}
 
-	public void getReward(Player player) {
+	public void getReward(final Player player) {
 		for (int[] rewards : reward) {
 			player.getInventory().addItemOrDrop(new Item(rewards[0], rewards[1]));
 		}
-		for (int[] expRewards : expReward) {
-			player.getSkill().addExp(expRewards[0], (expRewards[1]));
+		for (final int[] expRewards : expReward) {
+			CycleEventHandler.getInstance().addEvent(player, new CycleEvent() {
+				@Override
+				public void execute(CycleEventContainer b) {
+					b.stop();
+				}
+
+				@Override
+				public void stop() {
+					player.getSkill().addExp(expRewards[0], (expRewards[1]));
+				}
+			}, 4);
 		}
 		player.addQuestPoints(questPointReward);
 		player.getActionSender().QPEdit(player.getQuestPoints());
@@ -90,8 +101,8 @@ public class TemplateQuest implements Quest {
 		switch(questStage) { 
 			/**The last index of the text sent for that quest stage which persists
 			through the entire quest, striked or not (i.e, shit sent below)
-			Remember if there is no new persistant entry for that stage, stack the case with
-			the last case that started the newest persistant entry, to keep lastIndex correct **/
+			Remember if there is no new persistent entry for that stage, stack the case with
+			the last case that started the newest persistent entry, to keep lastIndex correct **/
 			case QUEST_STARTED:
 				lastIndex = 4;
 				break;

@@ -72,7 +72,7 @@ public class RandomHandler {
 	}
 	
 	public void spawnEvent() {
-		if (player.getRandomEventNpc() != null || player.cantTeleport() || player.getInJail() || player.isCrossingObstacle || (player.onApeAtoll() && player.getMMVars().isMonkey())) {
+		if (player.getRandomEventNpc() != null || player.cantTeleport() || player.isInCutscene() || player.getInJail() || player.isCrossingObstacle || (player.onApeAtoll() && player.getMMVars().isMonkey())) {
 			return;
 		}
 		int random = Misc.random(7);
@@ -92,7 +92,8 @@ public class RandomHandler {
 				TalkToEvent.spawnNpc(player, TalkToNpc.JEKYLL);
 				break;
 			case 4:
-				getFreakyForester().spawnForester();
+				getFreakyForester().spawnEvent();
+				setCurrentEvent(freakyForester);
 				break;
 			case 5:
 				getSandwichLady().spawnEvent();
@@ -125,10 +126,10 @@ public class RandomHandler {
 		}
 	}
 	
-	public void destroyEvent() {
+	public void destroyEvent(boolean logout) {
 		if(getCurrentEvent() != null)
 		{
-			getCurrentEvent().destroyEvent();
+			getCurrentEvent().destroyEvent(logout);
 			setCurrentEvent(null);
 		}
 	}

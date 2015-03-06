@@ -56,8 +56,11 @@ public class MimeEvent implements RandomEvent {
 		myTurn = false;
 		currentStage = 0;
 		correct = 0;
-		player.getRandomHandler().spawnEventNpc(mysteriousOldManId);
 		player.setStopPacket(true);
+		player.getMovementHandler().reset();
+		player.getMovementHandler().resetOnWalkPacket();
+		player.getAttributes().put("canTakeDamage", Boolean.FALSE);
+		player.getRandomHandler().spawnEventNpc(mysteriousOldManId);
 		player.setMovementDisabled(true);
 		CycleEventHandler.getInstance().addEvent(player, new CycleEvent() {
 		    int cycle = 0;
@@ -69,7 +72,6 @@ public class MimeEvent implements RandomEvent {
 		    			player.getRandomEventNpc().getUpdateFlags().sendForceMessage("Come with me "+name+"!");
 		    		break;
 		    		case 2:
-		    			player.setStopPacket(false);
 		    			player.teleport(new Position(2008,4762,player.getIndex()*4));
 		    			player.getUpdateFlags().sendFaceToDirection(new Position(2008,4761,player.getIndex()*4));
 		    			player.getActionSender().hideAllSideBars();
@@ -80,6 +82,10 @@ public class MimeEvent implements RandomEvent {
 		    			mime.teleport(new Position(2011,4762,player.getIndex()*4));
 		    			mime.setFollowingEntity(null);
 		    			mime.setFace(3);
+				    break;
+		    		case 3:
+		    			player.setStopPacket(false);
+		    			player.getActionSender().animateObject(2007, 4761, 1, 1135);
 		    			Dialogues.startDialogue(player, mysteriousOldManId);
 					    container.stop();
 				    return;
@@ -94,11 +100,18 @@ public class MimeEvent implements RandomEvent {
 	}
 
 	@Override
-	public void destroyEvent() {
+	public void destroyEvent(boolean logout) {
 		player.getRandomHandler().setCurrentEvent(null);
 		player.getRandomHandler().destroyEventNpc();
-		player.setMovementDisabled(false);
 		mime = null;
+		player.setMovementDisabled(false);
+		if(!logout)
+		{
+			player.getAttributes().put("canTakeDamage", Boolean.TRUE);
+			player.getActionSender().sendSideBarInterfaces();
+			player.getEquipment().sendWeaponInterface();
+			player.teleport(player.getLastPosition());
+		}
 	}
 
 	@Override
@@ -152,7 +165,7 @@ public class MimeEvent implements RandomEvent {
 					return true;
 					case 2:
 						player.getDialogue().endDialogue();
-						performEmoteMime();
+						performEmoteMime(true);
 					return false;
 			    }
 			break;
@@ -186,13 +199,11 @@ public class MimeEvent implements RandomEvent {
 	}
 	
 	public void handleReward(){
-		destroyEvent();
-		player.getActionSender().sendSideBarInterfaces();
-		player.teleport(player.getLastPosition());
+		destroyEvent(false);
 		if(correct >= 4)
 		{
 			int itemReward = getItemReward();
-			Item item = new Item(itemReward, itemReward == 995 ? 2000 : 1);
+			Item item = new Item(itemReward, itemReward == 995 ? 1250 : 1);
 			player.getInventory().addItemOrDrop(item);
 			player.getDialogue().sendGiveItemNpc("Your performance was great, The mime has rewarded you.", item);
 		}else{
@@ -237,7 +248,7 @@ public class MimeEvent implements RandomEvent {
 	    			CycleEventHandler.getInstance().addEvent(player, new CycleEvent() {
 	    			    @Override
 	    			    public void execute(CycleEventContainer container) {
-	    	    			performEmoteMime();
+	    	    			performEmoteMime(false);
 	    			    	container.stop();
 	    			    }
 	    		
@@ -255,11 +266,15 @@ public class MimeEvent implements RandomEvent {
 		}
 	}
 	
-	public void performEmoteMime() {
+	public void performEmoteMime(boolean firstTime) {
 		if(mime != null)
 		{
 			emoteToDo = MimeEmote.values()[Misc.random(MimeEmote.values().length-1)];
 			mime.setFace(3);
+			if(!firstTime){
+				player.getActionSender().animateObject(2007, 4761, 1, 1135);
+				player.getActionSender().animateObject(2010, 4761, 1, 1136);
+			}
 			CycleEventHandler.getInstance().addEvent(mime, new CycleEvent() {
 			    @Override
 			    public void execute(CycleEventContainer container) {
@@ -288,6 +303,8 @@ public class MimeEvent implements RandomEvent {
 	    			    		container.stop();
 	    			    		return;
 	    			    	}
+			    			player.getActionSender().animateObject(2007, 4761, 1, 1136);
+			    			player.getActionSender().animateObject(2010, 4761, 1, 1135);
 	    	    			mime.getUpdateFlags().sendAnimation(858);
 	    	    			player.getActionSender().sendChatInterface(6543);
 	    	    			myTurn = true;
@@ -306,6 +323,12 @@ public class MimeEvent implements RandomEvent {
 			    }
 			}, emoteToDo.duration + 2);
 		}
+	}
+
+	@Override
+	public boolean doObjectClicking(int object, int x, int y, int z) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 	
 }

@@ -90,7 +90,7 @@ public class SandwichLady implements RandomEvent {
 	}
 	
 	@Override
-	public void destroyEvent() {
+	public void destroyEvent(boolean logout) {
 		player.getRandomHandler().setCurrentEvent(null);
 		player.getRandomHandler().destroyEventNpc();
 		player.setStatedInterface("");
@@ -162,7 +162,7 @@ public class SandwichLady implements RandomEvent {
 		CycleEventHandler.getInstance().addEvent(player, new CycleEvent() {
 			@Override
 			public void execute(CycleEventContainer container) {
-				destroyEvent();
+				destroyEvent(false);
 				container.stop();
 			}
 			@Override
@@ -173,6 +173,12 @@ public class SandwichLady implements RandomEvent {
 	
 	public String[] cycleMessages() {
 		return new String[]{"Hello %, I would like to offer you a treat!", "You'd better start showing some manners, %!", "Well, I've never been so insulted!!", "Fine, ignore me, you will regret it!"};
+	}
+
+	@Override
+	public boolean doObjectClicking(int object, int x, int y, int z) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

@@ -292,6 +292,37 @@ public class JunglePotion implements Quest {
 	switch (WITCHDOCTA) { //Npc ID
 	    case WITCHDOCTA:
 		switch (player.getQuestStage(this.getQuestID())) { //Dialogue per stage
+		    case 0:
+			switch (d.getChatId()) {
+				case 1:
+					if (!QuestHandler.questCompleted(player, 10)){
+						d.sendNpcChat("Go away, I need to work on this potion", Dialogues.ANNOYED);
+						d.endDialogue();
+						return true;
+					}else {
+						d.sendNpcChat("Greetings Bwana, I am Trufius Shakaya of the Tai Bow Wannai village", Dialogues.CONTENT);
+						d.sendNpcChat("Welcome to my humble village.", Dialogues.CONTENT);
+						return true;
+						
+					}
+				case 2:
+					d.sendOption("What does Bwana mean?", "Tai Bow Wannai, what does that mean?", "It's a nice village were is everyone?");
+					return true;
+				case 3:
+					switch(optionId) {
+						case 1:
+							d.sendNpcChat("Some tribal shit I don't know.", Dialogues.CONTENT);
+							d.setNextChatId(2);
+							return true;
+						case 2:
+							d.sendNpcChat("It means were da white women at", Dialogues.CONTENT);
+                                                        d.setNextChatId(2);
+							return true;
+						case 3:
+							d.sendNpcChat("My people are afraid to stay in the village. They have", "returned to the jungle. I need to commune with the", "gods to see what fate befalls us.", Dialogues.CONTENT);
+							return true;
+			}	
+			}		
 		    case QUEST_COMPLETE:
 			switch (d.getChatId()) {
 			    case 1:

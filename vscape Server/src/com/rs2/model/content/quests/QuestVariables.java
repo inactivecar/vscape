@@ -77,6 +77,12 @@ public class QuestVariables {
     private boolean secondMortMyreBridgeFixed = false;
     private boolean thirdMortMyreBridgeFixed = false;
     public boolean[] myrequeTalkedToBools = {false, false, false, false, false};
+    public int plagueCitySoilSoftened = 0;
+    public boolean triedPipeGrill = false;
+    public boolean talkedToParents = false;
+    public boolean allowedToSeeBravek = false;
+    public boolean healedHangover = false;
+    private boolean canTeleportArdougne = false;
     
     public QuestVariables(final Player player) {
 	this.player = player;
@@ -463,6 +469,14 @@ public class QuestVariables {
 		return this.thirdMortMyreBridgeFixed;
 	}
 	return false;
+    }
+    
+    public boolean canTeleportArdougne() {
+	    return this.canTeleportArdougne;
+    }
+    
+    public void setCanTeleportArdougne(boolean set) {
+	    this.canTeleportArdougne = set;
     }
     
 }

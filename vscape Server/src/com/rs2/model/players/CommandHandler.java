@@ -19,6 +19,7 @@ import com.rs2.model.content.combat.hit.Hit;
 import com.rs2.model.content.combat.hit.HitDef;
 import com.rs2.model.content.combat.hit.HitType;
 import com.rs2.model.content.combat.util.Degradeables;
+import com.rs2.model.content.consumables.Food;
 import com.rs2.model.content.minigames.castlewars.Castlewars;
 import com.rs2.model.content.minigames.fightcaves.FightCaves;
 import com.rs2.model.content.minigames.pestcontrol.PestControl;
@@ -491,14 +492,6 @@ public class CommandHandler {
 					SpawnEvent.spawnNpc(sender, RandomNpc.ZOMBIE);
 					break;
 			}
-		}
-		if (keyword.equals("mime")) {
-			sender.getRandomHandler().getMimeEvent().spawnEvent();
-			sender.getRandomHandler().setCurrentEvent(sender.getRandomHandler().getMimeEvent());
-		}
-		if (keyword.equals("sandwitch")) {
-			sender.getRandomHandler().getSandwichLady().spawnEvent();
-			sender.getRandomHandler().setCurrentEvent(sender.getRandomHandler().getSandwichLady());
 		}
 		/*if (keyword.equals("highscoresinit"))
 		{
@@ -1893,6 +1886,15 @@ public class CommandHandler {
     			sender.getActionSender().sendMessage("Problem reloading Shops.", true);
     		}
         }
+        else if(keyword.equals("reloadfood"))
+        {
+        	try{
+        		Food.init();
+        		sender.getActionSender().sendMessage("Food defs were reloaded.", true);
+        	} catch (Exception e) {
+    			sender.getActionSender().sendMessage("Problem reloading Food defs.", true);
+    		}
+        }
         else if(keyword.equals("searchbank")) {
 			int id = Integer.parseInt(args[0]);
 			if(id < 0 || id > Constants.MAX_ITEMS)
@@ -1929,6 +1931,19 @@ public class CommandHandler {
 		    	}else{
 		    		sender.getActionSender().sendMessage("Player " + name + " does not have item " + new Item(id).getDefinition().getName() + ".", true);
 		    	}
+		    } else {
+		    	sender.getActionSender().sendMessage("Player not found.", true);
+		    }
+		}else if(keyword.equals("destroyrandom")) {
+			Player player = World.getPlayerByName(fullString);
+		    if(player != null) {
+		    	if(player.getRandomHandler().getCurrentEvent() != null)
+		    	{
+		    		player.getRandomHandler().destroyEvent(false);
+		    		sender.getActionSender().sendMessage("Destroyed random event for player "+player.getUsername(), true);
+			    } else {
+			    	sender.getActionSender().sendMessage("Player does not have a random event active.", true);
+			    }
 		    } else {
 		    	sender.getActionSender().sendMessage("Player not found.", true);
 		    }
