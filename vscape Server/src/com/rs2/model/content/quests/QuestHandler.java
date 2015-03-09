@@ -260,7 +260,7 @@ public class QuestHandler {
 		case 46131: //In Search of the Myreque
 			showInterface(player,quests[38]);
         		return true;
-		case 7365: //Jungle Potion
+		case 28197: //Jungle Potion
 			showInterface(player,quests[40]);
 			return true;
 		case 28204: //Plague City
