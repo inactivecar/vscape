@@ -65,7 +65,7 @@ public class JunglePotion implements Quest {
     private static final int questPointReward = 1; //Change
 
     public int getQuestID() { //Change
-	return 39;
+	return 40;
     }
 
     public String getQuestName() { //Change
@@ -303,7 +303,7 @@ public class JunglePotion implements Quest {
 
     public boolean sendDialogue(final Player player, final int id, int chatId, int optionId, int npcChatId) {
 	DialogueManager d = player.getDialogue();
-	switch (WITCHDOCTA) { //Npc ID
+	switch (id) { //Npc ID
 	    case WITCHDOCTA:
 		switch (player.getQuestStage(this.getQuestID())) { //Dialogue per stage
 		    case 0:
@@ -386,7 +386,6 @@ public class JunglePotion implements Quest {
 				case 13:
 					d.sendNpcChat("It grows near vines in an area to the south west were", "the ground turns soft and the water kisses your feet.", CONTENT);
 					player.setQuestStage(this.getQuestID(), GET_SNAKE);
-					d.endDialogue();
 					return true;
 			}
 			return false;
@@ -397,6 +396,7 @@ public class JunglePotion implements Quest {
 					return true;
 				case 2:
 					d.sendOption("Yes it's right here.", "Oh that's what i need");
+					return true;
 				case 3:
 					switch(optionId) {
 						case 1:
@@ -412,6 +412,7 @@ public class JunglePotion implements Quest {
 						}
 						case 2:
 							d.sendNpcChat("Well return to me when you have it then", CONTENT);
+							d.endDialogue();
 							return true;
 					}
 					return false;
@@ -424,6 +425,7 @@ public class JunglePotion implements Quest {
                                         return true;
 				case 2:
                                         d.sendOption("Yes it's right here.", "Oh that's what I need");
+					return true;
                                 case 3:
                                         switch(optionId) {
                                                 case 1:
@@ -439,12 +441,14 @@ public class JunglePotion implements Quest {
 						}
 						case 2:
 							d.sendNpcChat("Well return to me when you have it then", CONTENT);
+							d.endDialogue();
                                                         return true;
 						}
 					return false;
 				case 4:
 					d.sendNpcChat("You are doing well Bwana. The next herb is called Sito", "Foil, and it grows best were the ground has been", "blacked by living flame.", CONTENT);
 					player.setQuestStage(this.getQuestID(), GET_SITO);
+					return true;
 			}
 			return false;
 		   case GET_SITO:
@@ -454,6 +458,7 @@ public class JunglePotion implements Quest {
                                         return true;
                                 case 2:
                                         d.sendOption("Yes it's right here.", "Oh that's what I need");
+					return true;
                                 case 3:
                                         switch(optionId) {
                                                 case 1:
@@ -470,6 +475,7 @@ public class JunglePotion implements Quest {
                                                 }
                                                 case 2:
                                                         d.sendNpcChat("Well return to me when you have it then", CONTENT);
+							d.endDialogue();
                                                         return true;
                                                 }
                                         return false;
@@ -478,7 +484,7 @@ public class JunglePotion implements Quest {
 					return true;
 				case 5:
 					d.sendNpcChat("It prefers rocks of high metal content and a frequently", "disturbed enviroment. There is some, I belive to the", "south east of this village.", CONTENT);
-					d.endDialogue();
+					
 					return true;
                         }
                         return false;
@@ -489,6 +495,7 @@ public class JunglePotion implements Quest {
                                         return true;
                                 case 2:
                                         d.sendOption("Yes it's right here.", "Oh that's what I need");
+					return true;
                                 case 3:
                                         switch(optionId) {
                                                 case 1:
@@ -513,7 +520,7 @@ public class JunglePotion implements Quest {
 					return true;
 				case 5:
 					d.sendNpcChat("in the nothern part of the island. A secret entrance to", "the cavern is set into the nothern cliffs of this island.", "Take care Bwana as it may be dangerous", CONTENT);
-                                        d.endDialogue();
+                                        //d.endDialogue();
                         }
                         return false;
 		case GET_PURSE:
@@ -523,6 +530,7 @@ public class JunglePotion implements Quest {
                                         return true;
                                 case 2:
                                         d.sendOption("Yes it's right here.", "Oh that's what I need");
+					return true;
                                 case 3:
                                         switch(optionId) {
                                                 case 1:
@@ -539,12 +547,13 @@ public class JunglePotion implements Quest {
                                                 }
                                                 case 2:
                                                         d.sendNpcChat("Well return to me when you have it then", CONTENT);
+							d.endDialogue();
                                                         return true;
                                                 }
                                         return false;
                                 case 4:
 					d.sendNpcChat("Many blessings on you! I must prepare, please", "excuse me while I make the arangements.", CONTENT);
-					d.endDialogue();
+//					d.endDialogue();
 					return true;
 			}
 			return false;
@@ -562,5 +571,6 @@ public class JunglePotion implements Quest {
 	}
 	return false;
     }
+
 
 }
